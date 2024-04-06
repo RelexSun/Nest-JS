@@ -5,9 +5,11 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateNinjaDto } from './dto/create-ninja.dto';
 import { UpdateNinjaDto } from './dto/update-ninja.dto';
@@ -26,9 +28,10 @@ export class NinjasController {
 
   // GET /ninjas/:id --> {...}
   @Get(':id')
-  getOneNinja(@Param('id') id: string) {
+  getOneNinja(@Param('id', ParseIntPipe) id: number) {
+    // ParseIntPipe instead of typecast
     try {
-      return this.ninjasService.getNinja(+id); // typecast to change string to number
+      return this.ninjasService.getNinja(id); // (+id) typecast to change string to number
     } catch (err) {
       throw new NotFoundException();
     }
@@ -36,7 +39,7 @@ export class NinjasController {
 
   // POST /ninjas
   @Post()
-  createNinja(@Body() createNinjaDto: CreateNinjaDto) {
+  createNinja(@Body(new ValidationPipe()) createNinjaDto: CreateNinjaDto) {
     return this.ninjasService.createNinja(createNinjaDto);
   }
 
